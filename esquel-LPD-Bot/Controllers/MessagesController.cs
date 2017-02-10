@@ -7,6 +7,10 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
+using esquel_LPD_Bot.Model;
+using System.Collections.Generic;
+using Microsoft.Bot.Builder.Dialogs;
+using esquel_LPD_Bot.Dialog;
 
 namespace esquel_LPD_Bot
 {
@@ -21,20 +25,28 @@ namespace esquel_LPD_Bot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                // calculate something for us to return
-                int length = (activity.Text ?? string.Empty).Length;
+                //ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+                //// calculate something for us to return
+                //int length = (activity.Text ?? string.Empty).Length;
 
-                // return our reply to the user
-                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
-                await connector.Conversations.ReplyToActivityAsync(reply);
+                //LPDService.GarmentStyleHelper garmentHelper = new LPDService.GarmentStyleHelper();
+                //StyleProduct l_class = await garmentHelper.GarmentStyleSearch(activity.Text);
+
+                //// return our reply to the user
+                //Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters { l_class.linePlanProducts.productID }");
+                //await connector.Conversations.ReplyToActivityAsync(reply);
+
+                await Conversation.SendAsync(activity, () => new LPDSearchDialog());
             }
             else
             {
                 HandleSystemMessage(activity);
             }
-            var response = Request.CreateResponse(HttpStatusCode.OK);
-            return response;
+
+            return new HttpResponseMessage(HttpStatusCode.Accepted);
+
+            //var response = Request.CreateResponse(HttpStatusCode.OK);
+            //return response;
         }
 
         private Activity HandleSystemMessage(Activity message)
