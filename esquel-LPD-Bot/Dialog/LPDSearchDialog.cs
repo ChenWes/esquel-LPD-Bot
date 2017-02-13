@@ -65,40 +65,56 @@ namespace esquel_LPD_Bot.Dialog
             StyleProduct l_styleProduct = await new GarmentStyleHelper().GarmentStyleSearch(pi_GarmentStyle);
 
             if (l_styleProduct != null)
-            {
-                List<CardImage> cardImages = new List<CardImage>();
-                cardImages.Add(new CardImage(url: l_styleProduct.productStyles.imageURL));                
-                List<CardAction> cardButtons = new List<CardAction>();
-                CardAction plButton = new CardAction()
+            {                
+                replyMessage.Text = l_styleProduct.linePlanProducts.productID + "(" + l_styleProduct.linePlanProducts.productVersion + l_styleProduct.linePlanProducts.productVersionSerialNo + ")";
+                
+                //button
+                var actions = new List<CardAction>();
+                actions.Add(new CardAction
                 {
-                    Value = l_styleProduct.productStyles.imageURL,
-                    Type = "openUrl",
-                    Title = "View Image"
-                };
-                cardButtons.Add(plButton);
-                HeroCard plCard = new HeroCard()
+                    Title = $"ViewBOM",
+                    Value = $"Search Garment Style",//this action will send message to Bot
+                    Type = ActionTypes.ImBack,
+                    Image = "https://placeholdit.imgix.net/~text?txtsize=16&txt=WesChen&w=125&h=40&txttrack=0&txtclr=000&txtfont=bold"
+                });
+
+                if (l_styleProduct.linePlanProducts.productMaterialConfigs != null && l_styleProduct.linePlanProducts.productMaterialConfigs.Count() > 0)
                 {
-                    Title = l_styleProduct.linePlanProducts.productID,
-                    Subtitle = "(" + l_styleProduct.linePlanProducts.productVersion + l_styleProduct.linePlanProducts.productVersionSerialNo + ")",
-                    Images = cardImages,
-                    Buttons = cardButtons
-                };
-                Attachment plAttachment = plCard.ToAttachment();
-                replyMessage.Attachments.Add(plAttachment);
+                    //attachment layout style
+                    replyMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+
+                    //foreach add herocard
+                    foreach (var getColorway in l_styleProduct.linePlanProducts.productMaterialConfigs)
+                    {
+                        replyMessage.Attachments.Add(new ThumbnailCard
+                        {
+                            Title = getColorway.colorway + "(" + getColorway.optionNo + ")",
+                            Subtitle = getColorway.primaryFabricID,
+                            Text = getColorway.pluNumber,
+                            Images = new List<CardImage>
+                            {
+                                new CardImage
+                                {
+                                    Url=getColorway.PrimaryFabricImageUrl,
+                                    Alt=getColorway.colorway + "(" +getColorway.optionNo + ")"
+                                }
+                            },
+                            Buttons = actions
+                            //,
+                            //Tap = new CardAction()
+                            //{
+                            //    Title="imBack title",
+                            //    Type= "imBack",
+                            //    Image= "https://placeholdit.imgix.net/~text?txtsize=16&txt=WesChen&w=125&h=40&txttrack=0&txtclr=000&txtfont=bold",
+                            //    Value="ss"
+                            //}
+                        }.ToAttachment());
+                    }
+                }
             }
             else
             {
-                List<CardAction> cardButtons = new List<CardAction>();
-                CardAction plButton = new CardAction()
-                {
-                    Value = "https://<OAuthSignInURL>",
-                    Type = "signin",
-                    Title = "Nothing Found"
-                };
-                cardButtons.Add(plButton);
-                SigninCard plCard = new SigninCard(text: "Please Entry Garment Style No", buttons: cardButtons);
-                Attachment plAttachment = plCard.ToAttachment();
-                replyMessage.Attachments.Add(plAttachment);
+                replyMessage.Text = "Sorry , Can Not Found Garment Style.";
             }
         }
     }
