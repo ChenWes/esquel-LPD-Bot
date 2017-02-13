@@ -131,6 +131,7 @@
     <Compile Include="LPDService\FabricHelper.cs" />
     <Compile Include="LPDService\GarmentStyleHelper.cs" />
     <Compile Include="LPDService\TrimHelper.cs" />
+    <Compile Include="LuisService\LPDSearchLuisDialog.cs" />
     <Compile Include="Model\ApparelTrim.cs" />
     <Compile Include="Model\Auxiliary.cs" />
     <Compile Include="Model\Base\BaseResponse.cs" />

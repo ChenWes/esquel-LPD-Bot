@@ -13,6 +13,7 @@ using Microsoft.Bot.Builder.Dialogs;
 using esquel_LPD_Bot.Dialog;
 using Microsoft.Bot.Builder.Dialogs.Internals;
 using Autofac;
+using esquel_LPD_Bot.LuisService;
 
 namespace esquel_LPD_Bot
 {
@@ -35,7 +36,7 @@ namespace esquel_LPD_Bot
                 //Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters ");
                 //await connector.Conversations.ReplyToActivityAsync(reply);
 
-                await Conversation.SendAsync(activity, () => new LPDSearchDialog());
+                await Conversation.SendAsync(activity, () => new LPDSearchLuisDialog());
             }    
             else if(activity.Type == ActivityTypes.ConversationUpdate)
             {
