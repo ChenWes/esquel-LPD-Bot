@@ -11,6 +11,8 @@ using esquel_LPD_Bot.Model;
 using System.Collections.Generic;
 using Microsoft.Bot.Builder.Dialogs;
 using esquel_LPD_Bot.Dialog;
+using Microsoft.Bot.Builder.Dialogs.Internals;
+using Autofac;
 
 namespace esquel_LPD_Bot
 {
@@ -34,7 +36,32 @@ namespace esquel_LPD_Bot
                 //await connector.Conversations.ReplyToActivityAsync(reply);
 
                 await Conversation.SendAsync(activity, () => new LPDSearchDialog());
-            }
+            }    
+            else if(activity.Type == ActivityTypes.ConversationUpdate)
+            {
+                //the first time will send welcome message to user
+                IConversationUpdateActivity update = activity;
+                using (var scope = DialogModule.BeginLifetimeScope(Conversation.Container, activity))
+                {
+                    var client = scope.Resolve<IConnectorClient>();
+                    if (update.MembersAdded.Any())
+                    {
+                        var reply = activity.CreateReply();
+                        foreach (var newMember in update.MembersAdded)
+                        {
+                            if (newMember.Id != activity.Recipient.Id)
+                            {
+                                reply.Text = $"Welcome {newMember.Name} To Esquel LPD Bot";
+                            }
+                            else
+                            {
+                                reply.Text = $"Welcome {activity.From.Name} To Esquel LPD Bot";
+                            }
+                            await client.Conversations.ReplyToActivityAsync(reply);
+                        }
+                    }
+                }
+            }        
             else
             {
                 HandleSystemMessage(activity);
