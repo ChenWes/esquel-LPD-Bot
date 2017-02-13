@@ -29,11 +29,8 @@ namespace esquel_LPD_Bot
                 //// calculate something for us to return
                 //int length = (activity.Text ?? string.Empty).Length;
 
-                //LPDService.GarmentStyleHelper garmentHelper = new LPDService.GarmentStyleHelper();
-                //StyleProduct l_class = await garmentHelper.GarmentStyleSearch(activity.Text);
-
                 //// return our reply to the user
-                //Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters { l_class.linePlanProducts.productID }");
+                //Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters ");
                 //await connector.Conversations.ReplyToActivityAsync(reply);
 
                 await Conversation.SendAsync(activity, () => new LPDSearchDialog());

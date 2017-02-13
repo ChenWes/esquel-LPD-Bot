@@ -35,8 +35,8 @@ namespace esquel_LPD_Bot.Dialog
             }
             else
             {
-                await context.PostAsync("sorry , i can not ");
-                context.Wait(MessageReceiveStart);
+                await context.PostAsync("sorry , i can not support you operation");
+                context.Wait(MessageReceiveChoice);
             }
         }
 
@@ -44,18 +44,62 @@ namespace esquel_LPD_Bot.Dialog
         {
             var message = await result;
 
-            StyleProduct l_styleProduct = await new GarmentStyleHelper().GarmentStyleSearch(message.Text.Trim());
-
-            if(l_styleProduct!=null)
+            if (!string.IsNullOrEmpty(message.Text.Trim()))
             {
-                await context.PostAsync($"you search garment style: { l_styleProduct.linePlanProducts.productID } : { l_styleProduct.linePlanProducts.productVersion } - { l_styleProduct.linePlanProducts.productVersionSerialNo } ");
+                var replyMessage = context.MakeMessage();
+                replyMessage.Attachments = new List<Attachment>();
+
+                await SearchGarmentStyle(replyMessage, message.Text);
+                await context.PostAsync(replyMessage);
             }
             else
             {
                 await context.PostAsync("sorry , can not search garment style");
             }
 
-            context.Wait(MessageReceiveChoice);                     
+            context.Wait(MessageReceiveChoice);
+        }
+
+        private static async Task SearchGarmentStyle(IMessageActivity replyMessage, string pi_GarmentStyle)
+        {
+            StyleProduct l_styleProduct = await new GarmentStyleHelper().GarmentStyleSearch(pi_GarmentStyle);
+
+            if (l_styleProduct != null)
+            {
+                List<CardImage> cardImages = new List<CardImage>();
+                cardImages.Add(new CardImage(url: l_styleProduct.productStyles.imageURL));                
+                List<CardAction> cardButtons = new List<CardAction>();
+                CardAction plButton = new CardAction()
+                {
+                    Value = l_styleProduct.productStyles.imageURL,
+                    Type = "openUrl",
+                    Title = "View Image"
+                };
+                cardButtons.Add(plButton);
+                HeroCard plCard = new HeroCard()
+                {
+                    Title = l_styleProduct.linePlanProducts.productID,
+                    Subtitle = "(" + l_styleProduct.linePlanProducts.productVersion + l_styleProduct.linePlanProducts.productVersionSerialNo + ")",
+                    Images = cardImages,
+                    Buttons = cardButtons
+                };
+                Attachment plAttachment = plCard.ToAttachment();
+                replyMessage.Attachments.Add(plAttachment);
+            }
+            else
+            {
+                List<CardAction> cardButtons = new List<CardAction>();
+                CardAction plButton = new CardAction()
+                {
+                    Value = "https://<OAuthSignInURL>",
+                    Type = "signin",
+                    Title = "Nothing Found"
+                };
+                cardButtons.Add(plButton);
+                SigninCard plCard = new SigninCard(text: "Please Entry Garment Style No", buttons: cardButtons);
+                Attachment plAttachment = plCard.ToAttachment();
+                replyMessage.Attachments.Add(plAttachment);
+            }
         }
     }
 }
