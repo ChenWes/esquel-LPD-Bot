@@ -52,11 +52,11 @@ namespace esquel_LPD_Bot
                         {
                             if (newMember.Id != activity.Recipient.Id)
                             {
-                                reply.Text = $"Welcome {newMember.Name} To Esquel LPD Bot";
+                                reply.Text = Common.ConfigHelper.GetConfigValue("BotWelcomeMessage")?? "Welcome To Esquel LPD Project Bot";
                             }
                             else
                             {
-                                reply.Text = $"Welcome {activity.From.Name} To Esquel LPD Bot";
+                                reply.Text = Common.ConfigHelper.GetConfigValue("BotWelcomeMessage")?? "Welcome To Esquel LPD Project Bot";
                             }
                             await client.Conversations.ReplyToActivityAsync(reply);
                         }
